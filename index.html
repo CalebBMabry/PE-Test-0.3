@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fitness Room Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🏋️ Fitness Room Tracker</div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="dashboard" class="active">🏠 Dashboard</button>
+      <button data-tab="profiles">👥 Profiles</button>
+      <button data-tab="weekly">⚖️ Weekly Check-In</button>
+      <button data-tab="workouts">🏃 Daily Workouts</button>
+      <button data-tab="data">💾 Import / Export</button>
+      <button data-tab="help">❓ Help</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="tab active"></section>
+
+    <!-- PROFILES -->
+    <section id="tab-profiles" class="tab">
+      <div class="toolbar">
+        <input type="search" id="profileSearch" placeholder="🔍 Search by name…">
+        <select id="profileSort">
+          <option value="name">Sort: Name A→Z</option>
+          <option value="age">Sort: Age</option>
+          <option value="weight">Sort: Latest weight</option>
+          <option value="hr">Sort: Median heart rate</option>
+        </select>
+        <span class="spacer"></span>
+        <button class="primary" id="addProfileBtn">➕ Add One Person</button>
+        <button id="bulkAddBtn">📋 Add Many at Once</button>
+      </div>
+      <div id="profilesTable" class="table-wrap"></div>
+    </section>
+
+    <!-- WEEKLY -->
+    <section id="tab-weekly" class="tab">
+      <div class="toolbar">
+        <div class="week-picker" data-picker="weekly"></div>
+        <input type="search" id="weeklySearch" placeholder="🔍 Filter names…">
+        <span class="spacer"></span>
+        <span class="hint">Type a value and press <kbd>Enter</kbd> to jump to the next person. Saves automatically.</span>
+      </div>
+      <div id="weeklyTable" class="table-wrap"></div>
+    </section>
+
+    <!-- WORKOUTS -->
+    <section id="tab-workouts" class="tab">
+      <div class="toolbar">
+        <div class="week-picker" data-picker="workouts"></div>
+        <div class="day-tabs" id="dayTabs"></div>
+        <input type="search" id="workoutSearch" placeholder="🔍 Filter names…">
+      </div>
+      <div class="toolbar fill-all">
+        <strong>Quick fill everyone shown:</strong>
+        <input id="fillType" list="workoutTypes" placeholder="Workout (e.g. Circuit)">
+        <input id="fillMinutes" type="number" min="0" max="600" placeholder="Minutes">
+        <button id="fillBtn">Apply to all shown</button>
+        <span class="spacer"></span>
+        <label class="toggle"><input type="checkbox" id="weekOverview"> Show whole week overview</label>
+      </div>
+      <div id="workoutTable" class="table-wrap"></div>
+    </section>
+
+    <!-- DATA -->
+    <section id="tab-data" class="tab">
+      <div class="cards">
+        <div class="card">
+          <h3>📥 Import people from a spreadsheet (CSV)</h3>
+          <p>Save your spreadsheet as <b>CSV</b> with these column headers (only <code>name</code> is required):</p>
+          <pre>name,birthday,weight,heartrate
+Jordan Smith,2009-04-12,142,68
+Ava Lee,03/22/2010,118,72</pre>
+          <p class="muted">Weight and heart rate (if included) are saved as this week's check-in.</p>
+          <input type="file" id="csvFile" accept=".csv,text/csv">
+          <button id="templateBtn">⬇️ Download blank template</button>
+        </div>
+        <div class="card">
+          <h3>💾 Backup &amp; Restore</h3>
+          <p>All data is saved in this browser. Download a backup regularly, or to move to another computer.</p>
+          <button class="primary" id="exportJsonBtn">⬇️ Download full backup (.json)</button>
+          <label class="file-btn">⬆️ Restore from backup<input type="file" id="importJson" accept=".json,application/json" hidden></label>
+        </div>
+        <div class="card">
+          <h3>📊 Export for Excel / Google Sheets</h3>
+          <button id="exportProfilesCsv">Profiles summary (.csv)</button>
+          <button id="exportWeeklyCsv">Weekly weight &amp; heart rate (.csv)</button>
+          <button id="exportWorkoutsCsv">Daily workouts (.csv)</button>
+        </div>
+        <div class="card">
+          <h3>🧪 Practice &amp; Settings</h3>
+          <p>Weight unit:
+            <select id="unitSelect"><option value="lb">pounds (lb)</option><option value="kg">kilograms (kg)</option></select>
+          </p>
+          <button id="sampleBtn">Load 120 sample people (to try it out)</button>
+          <button class="danger" id="resetBtn">🗑️ Erase ALL data</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HELP -->
+    <section id="tab-help" class="tab">
+      <div class="card help">
+        <h2>Quick Start (2 minutes)</h2>
+        <ol>
+          <li><b>Add people</b> — go to <b>👥 Profiles</b>. Use <b>➕ Add One Person</b>, or <b>📋 Add Many at Once</b> and paste a list (one person per line: <code>Name, Birthday</code>). For big rosters, import a CSV in <b>💾 Import / Export</b>.</li>
+          <li><b>Weekly check-in</b> — once a week, open <b>⚖️ Weekly Check-In</b>. Type each person's weight and resting heart rate. Press <kbd>Enter</kbd> to move down the list. It saves as you go.</li>
+          <li><b>Daily workouts (Mon–Fri)</b> — open <b>🏃 Daily Workouts</b>, pick the day, and type the workout and minutes for each person. If everyone did the same thing, use <b>Quick fill</b> to fill the whole list in one click.</li>
+          <li><b>See progress</b> — on <b>👥 Profiles</b>, click a name to see their weight chart, heart-rate history, and workouts.</li>
+          <li><b>Back up</b> — in <b>💾 Import / Export</b>, download a backup now and then.</li>
+        </ol>
+        <h3>Good to know</h3>
+        <ul>
+          <li><b>Median heart rate</b> is calculated automatically from all of a person's weekly heart-rate entries (the middle value — not thrown off by one odd reading).</li>
+          <li>Use the <b>◀ ▶</b> arrows to view or fix past weeks. <b>This week</b> jumps back to today.</li>
+          <li>To erase one entry, just clear the box.</li>
+          <li>Data stays on this computer, in this browser. Nothing is sent online.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <datalist id="workoutTypes"></datalist>
+
+  <!-- Modals -->
+  <dialog id="profileDialog">
+    <form method="dialog" id="profileForm">
+      <h2 id="profileDialogTitle">Add Person</h2>
+      <label>Full name *<input name="name" required autocomplete="off"></label>
+      <label>Birthday<input name="birthday" type="date"></label>
+      <label>Starting weight (optional)<input name="weight" type="number" step="0.1" min="0"></label>
+      <label>Resting heart rate, bpm (optional)<input name="hr" type="number" min="20" max="250"></label>
+      <label>Notes<textarea name="notes" rows="2"></textarea></label>
+      <div class="dialog-actions">
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button class="primary" value="save" id="profileSaveBtn">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="bulkDialog">
+    <form method="dialog" id="bulkForm">
+      <h2>Add Many People at Once</h2>
+      <p>One person per line. Format: <code>Name, Birthday</code> (birthday optional).<br>
+      You can paste straight from a spreadsheet (two columns).</p>
+      <textarea name="list" rows="12" placeholder="Jordan Smith, 2009-04-12&#10;Ava Lee, 03/22/2010&#10;Sam Patel"></textarea>
+      <div class="dialog-actions">
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button class="primary" value="save">Add Everyone</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="detailDialog" class="wide">
+    <div id="detailBody"></div>
+    <div class="dialog-actions"><button id="detailClose">Close</button></div>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
